@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import cors from "cors";
 import express from "express";
 import connectDB from "./config/db.js";
 import User from "./models/User.js";
@@ -9,6 +10,9 @@ const app = express();
 
 // Database Connection
 connectDB();
+
+// Adds headers: Access-Control-Allow-Origin: *
+app.use(cors());
 
 // Built-in Middleware
 // parse JSON to all routes
@@ -47,7 +51,7 @@ app.post("/user", async (req, res) => {
     // auto validation by mongoose
     res.status(400).json({
       success: false,
-      error: error.message,
+      message: error.message,
     });
   }
 });
