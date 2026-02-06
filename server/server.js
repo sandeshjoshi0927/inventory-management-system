@@ -23,6 +23,26 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
+// Get all Users
+app.get("/user/all", async (req, res) => {
+  try {
+    const users = await User.find();
+
+    // TODO if no user do something
+
+    res.status(201).json({
+      success: true,
+      message: "Successfully fetched Users.",
+      users: users,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 // Register User
 app.post("/user", async (req, res) => {
   try {
