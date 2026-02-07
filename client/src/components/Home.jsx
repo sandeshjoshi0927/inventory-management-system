@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { navigate } from "../utils/navigate";
 
 const Home = () => {
   console.log(window.location);
@@ -19,7 +20,7 @@ const Home = () => {
 
       //  TODO navigate to dashboard
 
-      window.location.href = "/dashboard";
+      navigate("/dashboard");
     } catch (error) {
       console.error(error.response.data.message);
     }
