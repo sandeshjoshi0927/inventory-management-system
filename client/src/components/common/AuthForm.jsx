@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
-const AuthForm = ({ type }) => {
+const AuthForm = ({ type, label }) => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -30,53 +30,57 @@ const AuthForm = ({ type }) => {
   const [password, setPassword] = useState("");
 
   return (
-    <>
-      <form onSubmit={(e) => handleSubmit(e)}>
-        {type === "register" && (
-          <div>
-            <label htmlFor="name">Name: </label>
-            <input
-              type="text"
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <br />
-          </div>
-        )}
+    <div className="h-screen flex items-center justify-center bg-red-300">
+      <div className="grid gap-10">
+        <div className="font-bold text-2xl">{label}</div>
 
-        <label htmlFor="email">Email: </label>
-        <input
-          type="email"
-          name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <br />
+        <form onSubmit={(e) => handleSubmit(e)}>
+          {type === "register" && (
+            <div className="flex flex-col">
+              <label htmlFor="name">Name: </label>
+              <input
+                className="border border-black rounded-sm px-2 py-3"
+                type="text"
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+          )}
 
-        <label htmlFor="password">Password: </label>
-        <input
-          type="password"
-          name="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br />
+          <label htmlFor="email">Email: </label>
+          <input
+            type="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <button type="submit">
-          {type === "register" ? "Register" : "Sign in"}
-        </button>
-      </form>
+          <label htmlFor="password">Password: </label>
+          <input
+            type="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-      <p>
-        <span>{type === "login" ? "Don't" : "Already"} have an account? </span>
-        <span>
-          <Link to={type === "register" ? "/login" : "/register"}>
-            {type === "register" ? "Sign in" : "Create One"}
-          </Link>
-        </span>
-      </p>
-    </>
+          <button type="submit">
+            {type === "register" ? "Register" : "Sign in"}
+          </button>
+        </form>
+
+        <p>
+          <span>
+            {type === "login" ? "Don't" : "Already"} have an account?{" "}
+          </span>
+          <span>
+            <Link to={type === "register" ? "/login" : "/register"}>
+              {type === "register" ? "Sign in" : "Create One"}
+            </Link>
+          </span>
+        </p>
+      </div>
+    </div>
   );
 };
 
