@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import Button from "./Button";
 
 const AuthForm = ({ type, label }) => {
   const navigate = useNavigate();
@@ -30,17 +31,18 @@ const AuthForm = ({ type, label }) => {
   const [password, setPassword] = useState("");
 
   return (
-    <div className="h-screen flex items-center justify-center bg-red-300">
-      <div className="grid gap-10">
-        <div className="font-bold text-2xl">{label}</div>
+    <div className="h-screen flex items-center justify-center">
+      <div className="grid gap-10 p-6 rounded-sm border border-gray-100 shadow-lg w-full max-w-120">
+        <h1 className="font-bold text-2xl">{label}</h1>
 
-        <form onSubmit={(e) => handleSubmit(e)}>
+        <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
           {type === "register" && (
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-2">
               <label htmlFor="name">Name: </label>
               <input
-                className="border border-black rounded-sm px-2 py-3"
+                className="p-2 border-b rounded-none"
                 type="text"
+                placeholder="Enter a name"
                 name="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -48,25 +50,33 @@ const AuthForm = ({ type, label }) => {
             </div>
           )}
 
-          <label htmlFor="email">Email: </label>
-          <input
-            type="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <div className="flex flex-col gap-2">
+            <label htmlFor="email">Email: </label>
+            <input
+              className="p-2 border-b rounded-none"
+              type="email"
+              placeholder="Enter an email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-          <label htmlFor="password">Password: </label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password">Password: </label>
+            <input
+              className="p-2 border-b rounded-none"
+              type="password"
+              placeholder="**********"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-          <button type="submit">
-            {type === "register" ? "Register" : "Sign in"}
-          </button>
+          <Button type="submit">
+            {type === "register" ? "Register" : "Sign In"}
+          </Button>
         </form>
 
         <p>
@@ -74,7 +84,10 @@ const AuthForm = ({ type, label }) => {
             {type === "login" ? "Don't" : "Already"} have an account?{" "}
           </span>
           <span>
-            <Link to={type === "register" ? "/login" : "/register"}>
+            <Link
+              to={type === "register" ? "/login" : "/register"}
+              className="text-blue-400 hover:underline underline-offset-2"
+            >
               {type === "register" ? "Sign in" : "Create One"}
             </Link>
           </span>
