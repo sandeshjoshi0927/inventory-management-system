@@ -44,9 +44,16 @@ app.get("/user/all", async (req, res) => {
 });
 
 // Register User
-app.post("/user", async (req, res) => {
+app.post("/user/create", async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
+    if (!name) {
+      res.status(422).json({
+        success: false,
+        message: "Name field is required.",
+      });
+    }
 
     // create user
     const user = await User.create({
@@ -55,20 +62,50 @@ app.post("/user", async (req, res) => {
       password,
     });
 
-    // Generate token
-    const token = generateToken(user._id);
+    // if user creation fails
+    if (!user) {
+      throw new Error("Error creating user.");
+    }
 
     // return success message with user id
     res.status(201).json({
       success: true,
       message: "User created successfully.",
-      token: token,
       user: {
         _id: user.id,
       },
     });
   } catch (error) {
     // auto validation by mongoose
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// login user
+app.post("/user/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email, password });
+
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      message: "Login Successfull.",
+      token: token,
+      user: {
+        _id: user.id,
+      },
+    });
+  } catch (error) {
     res.status(400).json({
       success: false,
       message: error.message,

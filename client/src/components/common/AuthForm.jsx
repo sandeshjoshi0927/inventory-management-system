@@ -1,7 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "./Button";
+import { createUser, loginUser } from "../../utils/auth.js";
 
 const AuthForm = ({ type, label }) => {
   const navigate = useNavigate();
@@ -10,17 +10,24 @@ const AuthForm = ({ type, label }) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:8080/user", {
-        name,
-        email,
-        password,
-      });
+      if (type === "register") {
+        const response = await createUser(name, email, password);
 
-      const token = response.data.token;
+        if (response.data.success) {
+          navigate("/dashboard");
+        }
+      } else {
+        const response = await loginUser(email, password);
 
-      localStorage.setItem("token", token);
+        if (!response) {
+          throw new Error("Error getting token.");
+        }
 
-      navigate("/dashboard");
+        if (response.data.success) {
+          localStorage.setItem("token", response.data.token);
+          navigate("/dashboard");
+        }
+      }
     } catch (error) {
       console.error(error.response.data.message);
     }
@@ -40,9 +47,9 @@ const AuthForm = ({ type, label }) => {
             <div className="flex flex-col gap-2">
               <label htmlFor="name">Name: </label>
               <input
-                className="p-2 border-b rounded-none"
+                className="p-2 border-b rounded-0 border-indigo-400 outline-0"
                 type="text"
-                placeholder="Enter a name"
+                placeholder="Enter your name"
                 name="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -53,7 +60,7 @@ const AuthForm = ({ type, label }) => {
           <div className="flex flex-col gap-2">
             <label htmlFor="email">Email: </label>
             <input
-              className="p-2 border-b rounded-none"
+              className="p-2 border-b rounded-0 border-indigo-400 outline-0"
               type="email"
               placeholder="Enter an email"
               name="email"
@@ -65,7 +72,7 @@ const AuthForm = ({ type, label }) => {
           <div className="flex flex-col gap-2">
             <label htmlFor="password">Password: </label>
             <input
-              className="p-2 border-b rounded-none"
+              className="p-2 border-b rounded-0 border-indigo-400 outline-0"
               type="password"
               placeholder="**********"
               name="password"
@@ -86,7 +93,7 @@ const AuthForm = ({ type, label }) => {
           <span>
             <Link
               to={type === "register" ? "/login" : "/register"}
-              className="text-blue-400 hover:underline underline-offset-2"
+              className="text-indigo-400 hover:underline underline-offset-2"
             >
               {type === "register" ? "Sign in" : "Create One"}
             </Link>
