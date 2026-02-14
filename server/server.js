@@ -4,6 +4,7 @@ import express from "express";
 import connectDB from "./config/db.js";
 import User from "./models/User.js";
 import { generateToken } from "./utils/helpers.js";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 const app = express();
@@ -46,28 +47,55 @@ app.get("/user/all", async (req, res) => {
 // Register User
 app.post("/user/create", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const name = req.body.name?.trim();
+    const email = req.body.email?.trim();
+    const password = req.body.password?.trim();
 
-    if (!name) {
-      res.status(422).json({
+    // check if name email password fields are not empty
+    if (!name || !email || !password) {
+      return res.status(422).json({
         success: false,
-        message: "Name field is required.",
+        message: "All fields are required.",
       });
     }
 
-    // create user
+    // check if email is a valid email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email.",
+      });
+    }
+
+    // Password length
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters.",
+      });
+    }
+
+    // check if user with that email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already registered.",
+      });
+    }
+
+    // hash the password using bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // store the user
     const user = await User.create({
       name,
       email,
-      password,
+      password: hashedPassword,
     });
 
-    // if user creation fails
-    if (!user) {
-      throw new Error("Error creating user.");
-    }
-
-    // return success message with user id
+    // return success message with user detail
     res.status(201).json({
       success: true,
       message: "User created successfully.",
@@ -76,7 +104,6 @@ app.post("/user/create", async (req, res) => {
       },
     });
   } catch (error) {
-    // auto validation by mongoose
     res.status(400).json({
       success: false,
       message: error.message,
