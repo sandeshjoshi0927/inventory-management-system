@@ -1,160 +1,89 @@
 import dotenv from "dotenv";
-import cors from "cors";
-import express from "express";
-import connectDB from "./config/db.js";
-import User from "./models/User.js";
-import { generateToken } from "./utils/helpers.js";
-import bcrypt from "bcrypt";
+import connectDB from "./src/config/db.js";
+// import { generateToken } from "./src/utils/helpers.js";
+import app from "./src/app.js";
 
 dotenv.config();
-const app = express();
 
 // Database Connection
 connectDB();
 
-// Adds headers: Access-Control-Allow-Origin: *
-app.use(cors());
-
-// Built-in Middleware
-// parse JSON to all routes
-app.use(express.json());
-
 // GET
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
+// app.get("/", (req, res) => {
+//   res.send("API is running...");
+// });
 
 // Get all Users
-app.get("/user/all", async (req, res) => {
-  try {
-    const users = await User.find();
+// app.get("/user/all", async (req, res) => {
+//   try {
+//     const users = await User.find();
 
-    // TODO if no user do something
+//     // TODO if no user do something
 
-    res.status(201).json({
-      success: true,
-      message: "Successfully fetched Users.",
-      users: users,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
+//     res.status(201).json({
+//       success: true,
+//       message: "Successfully fetched Users.",
+//       users: users,
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// });
 
-// Register User
-app.post("/user/create", async (req, res) => {
-  try {
-    const name = req.body.name?.trim();
-    const email = req.body.email?.trim();
-    const password = req.body.password?.trim();
+// // Register User
+// app.post("/user/create", async (req, res) => {
+//   try {
 
-    // check if name email password fields are not empty
-    if (!name || !email || !password) {
-      return res.status(422).json({
-        success: false,
-        message: "All fields are required.",
-      });
-    }
-
-    // check if email is a valid email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter a valid email.",
-      });
-    }
-
-    // Password length
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 characters.",
-      });
-    }
-
-    // check if user with that email already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "Email already registered.",
-      });
-    }
-
-    // hash the password using bcrypt
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // store the user
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
-
-    // return success message with user detail
-    res.status(201).json({
-      success: true,
-      message: "User created successfully.",
-      user: {
-        _id: user.id,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
+//   } catch (error) {}
+// });
 
 // login user
-app.post("/user/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+// app.post("/user/login", async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
 
-    const user = await User.findOne({ email, password });
+//     const user = await User.findOne({ email, password });
 
-    if (!user) {
-      throw new Error("User not found.");
-    }
+//     if (!user) {
+//       throw new Error("User not found.");
+//     }
 
-    const token = generateToken(user._id);
+//     const token = generateToken(user._id);
 
-    res.status(200).json({
-      success: true,
-      message: "Login Successfull.",
-      token: token,
-      user: {
-        _id: user.id,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
+//     res.status(200).json({
+//       success: true,
+//       message: "Login Successfull.",
+//       token: token,
+//       user: {
+//         _id: user.id,
+//       },
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// });
 
 // Delete User
-app.delete("/user/:id", async (req, res) => {
-  const { id } = req.params;
+// app.delete("/user/:id", async (req, res) => {
+//   const { id } = req.params;
 
-  const result = await User.findByIdAndDelete(id);
+//   const result = await User.findByIdAndDelete(id);
 
-  if (result) {
-    res.send("Deleted Succesfully.");
-  }
+//   if (result) {
+//     res.send("Deleted Succesfully.");
+//   }
 
-  return result;
-});
+//   return result;
+// });
 
-// serve
 const PORT = process.env.PORT || 8080;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
